@@ -1,6 +1,7 @@
 package com.axa.UserManagement.dto.account;
 
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
 public class InsertAccountDTO {
