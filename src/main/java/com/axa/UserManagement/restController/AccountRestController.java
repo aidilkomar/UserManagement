@@ -9,8 +9,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -22,8 +24,8 @@ public class AccountRestController {
 
     private static final Logger logger = LoggerFactory.getLogger(AccountRestController.class);
 
-    @GetMapping
-    public ResponseEntity<Object> get(String username){
+    @GetMapping("/username={username}")
+    public ResponseEntity<Object> get(@PathVariable(required = false) String username){
         username = (username == null) ? "" : username;
         try{
             List<AccountGridDTO> accounts = accountService.getGridAccount(username);
@@ -36,11 +38,15 @@ public class AccountRestController {
     }
 
     @PostMapping
-    public ResponseEntity<Object> post(@RequestBody InsertAccountDTO dto){
+    public ResponseEntity<Object> post(@Valid @RequestBody InsertAccountDTO dto, BindingResult bindingResult){
         try{
-            String respondId = accountService.saveAccount(dto);
-            logger.info("Endpoint: postAccount/save/" + respondId);
-            return ResponseEntity.status(HttpStatus.CREATED).body(respondId);
+            if(!bindingResult.hasErrors()){
+                String respondId = accountService.saveAccount(dto);
+                logger.info("Endpoint: postAccount/save/" + respondId);
+                return ResponseEntity.status(HttpStatus.CREATED).body(respondId);
+            } else {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Ada yang error");
+            }
         } catch (Exception e){
             logger.error("Endpoint: failPostAccount/error/" + e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("There is a run-time error on the server.");

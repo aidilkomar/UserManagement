@@ -2,10 +2,10 @@ package com.axa.UserManagement.dto.account;
 
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Size;
 
 public class InsertAccountDTO {
 
+    @NotBlank(message = "Username tidak boleh kosong")
     private String username;
 
     private String password;
